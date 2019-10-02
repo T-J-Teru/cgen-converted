@@ -1267,7 +1267,9 @@
 ;; If `vector-copy' doesn't exist (which is assumed to be the fast one),
 ;; provide a simple version.
 
-(if (defined? 'vector-copy)
-    (define /object-vector-copy vector-copy)
-    (define (/object-vector-copy v) (list->vector (vector->list v)))
+(define /object-vector-copy
+  (if (defined? 'vector-copy)
+      vector-copy
+      (lambda (v)
+        (list->vector (vector->list v))))
 )
