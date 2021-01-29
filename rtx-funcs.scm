@@ -18,14 +18,14 @@
 (define (def-rtx-funcs)
 
 ; Do not change the indentation here.
-  (let
-      (
-       ;; These are defined in rtl.scm.
-       (drn define-rtx-node)
-       (drsn define-rtx-syntax-node)
-       ;;(dron define-rtx-operand-node)
-       (drmn define-rtx-macro-node)
-       )
+(let
+(
+ ; These are defined in rtl.scm.
+ ;; (drn define-rtx-node)
+ ;; (drsn define-rtx-syntax-node)
+ ;; (dron define-rtx-operand-node)
+ ;; (drmn define-rtx-macro-node)
+)
 
 ; The reason for the odd indenting above is so that emacs begins indenting the
 ; following code at column 1.
@@ -35,7 +35,7 @@
 ; The code will expect the mode to be compatible even though `error'
 ; "doesn't return".  A small concession for simpler code.
 
-(drn (error &options &mode message)
+(define-rtx-node (error &options &mode message)
      #f
      (OPTIONS VOIDORNUMMODE STRING) (NA NA NA)
      MISC
@@ -45,7 +45,7 @@
 ; Enums
 ; Default mode is INT.
 
-(drn (enum &options &mode enum-name)
+(define-rtx-node (enum &options &mode enum-name)
      #f
      (OPTIONS ANYINTMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/ENUM-NAME/ ?
      ARG
@@ -60,31 +60,31 @@
 ; Ifields are normally specified by name, but they are subsequently wrapped
 ; in this.
 
-;; (dron (ifield &options &mode ifld-name)
-;;       #f
-;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/IFIELD-NAME/ ?
-;;       ARG
-;;       (let ((f (current-ifld-lookup ifld-name)))
-;; 	(make <operand> (obj-location f)
-;; 	      ifld-name (string-append ifld-name " used as operand")
-;; 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
-;; 			   (obj-atlist f))
-;; 	      (obj:name (ifld-hw-type f))
-;; 	      (obj:name (ifld-mode f))
-;; 	      (make <hw-index> 'anonymous 'ifield (ifld-mode f) f)
-;; 	      nil #f #f))
-;; )
+(define-rtx-operand-node (ifield &options &mode ifld-name)
+      #f
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/IFIELD-NAME/ ?
+      ARG
+      (let ((f (current-ifld-lookup ifld-name)))
+	(make <operand> (obj-location f)
+	      ifld-name (string-append ifld-name " used as operand")
+	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
+			   (obj-atlist f))
+	      (obj:name (ifld-hw-type f))
+	      (obj:name (ifld-mode f))
+	      (make <hw-index> 'anonymous 'ifield (ifld-mode f) f)
+	      nil #f #f))
+)
 
 ; Specify an operand.
 ; Operands are normally specified by name, but they are subsequently wrapped
 ; in this.
 
-;; (dron (operand &options &mode op-name)
-;;       #f
-;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
-;;       ARG
-;;       (current-op-lookup op-name)
-;; )
+(define-rtx-operand-node (operand &options &mode op-name)
+      #f
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
+      ARG
+      (current-op-lookup op-name)
+)
 
 ; Operand naming/numbering.
 ; Operands are given names so that the operands as used in the semantics can
@@ -110,7 +110,7 @@
 ; It can be the name of an existing operand.
 ; ??? Might also support numbering by allowing NEW-NAME to be a number.
 
-(drsn (name &options &mode new-name value)
+(define-rtx-syntax-node (name &options &mode new-name value)
       #f
       (OPTIONS ANYNUMMODE SYMBOL RTX) (NA NA NA ANY)
       ARG
@@ -126,14 +126,14 @@
 ; it expresses all the state].
 ; Compiled operands are wrapped in this so that they still look like rtx.
 
-;; (dron (xop &options &mode object)
-;;       #f
-;;       (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; ??? s/OBJECT/OPERAND/ ?
-;;       ARG
-;;       object
-;; )
+(define-rtx-operand-node (xop &options &mode object)
+      #f
+      (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; ??? s/OBJECT/OPERAND/ ?
+      ARG
+      object
+)
 
-;(dron (opspec: &options &mode op-name op-num hw-ref attrs)
+;(define-rtx-operand-node (opspec: &options &mode op-name op-num hw-ref attrs)
 ;      (OPTIONS ANYNUMMODE SYMBOL NUMBER RTX ATTRS) (NA NA NA NA ANY NA)
 ;      ARG
 ;      (let ((opval (rtx-eval-with-estate hw-ref (mode:lookup &mode) *estate*)))
@@ -152,12 +152,12 @@
 ; Local variables are normally specified by name, but they are subsequently
 ; wrapped in this.
 
-;; (dron (local &options &mode local-name)
-;;       #f
-;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/LOCAL-NAME/ ?
-;;       ARG
-;;       (rtx-temp-lookup (tstate-env *tstate*) local-name)
-;; )
+(define-rtx-operand-node (local &options &mode local-name)
+      #f
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/LOCAL-NAME/ ?
+      ARG
+      (rtx-temp-lookup (tstate-env *tstate*) local-name)
+)
 
 ; FIXME: This doesn't work.  See s-operand.
 ;(define (s-dup estate op-name)
@@ -169,7 +169,7 @@
 ;
 ; ??? Since operands are given names and not numbers this isn't currently used.
 ;
-;(drsn (dup &options &mode op-name)
+;(define-rtx-syntax-node (dup &options &mode op-name)
 ;     #f
 ;     (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA)
 ;     ;(s-dup *estate* op-name)
@@ -185,7 +185,7 @@
 ; and written if output operand).
 ; ??? What about input/output operands.
 
-(drsn (ref &options &mode name)
+(define-rtx-syntax-node (ref &options &mode name)
       BI
       (OPTIONS BIMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
       ARG
@@ -197,31 +197,31 @@
 ; ??? Mode handling incomplete, this doesn't handle mem, which it could.
 ; Until then we fix the mode of the result to INT.
 
-;; (dron (index-of &options &mode op-rtx)
-;;       INT
-;;       (OPTIONS INTMODE RTX) (NA NA ANY)
-;;       ARG
-;;       ;; FIXME: s/DFLT/&mode/ ?
-;;       (let* ((operand (rtx-eval-with-estate op-rtx DFLT *estate*))
-;; 	     (f (hw-index:value (op:index operand)))
-;; 	     (f-name (obj:name f)))
-;; 	(make <operand> (if (source-ident? f) (obj-location f) #f)
-;; 	      f-name f-name
-;; 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
-;; 			   (obj-atlist f))
-;; 	      (obj:name (ifld-hw-type f))
-;; 	      (obj:name (ifld-mode f))
-;; 	      (make <hw-index> 'anonymous
-;; 		    'ifield
-;; 		    (ifld-mode f)
-;; 		    ; (send (op:type op) 'get-index-mode)
-;; 		    f)
-;; 	      nil #f #f))
-;; )
+(define-rtx-operand-node (index-of &options &mode op-rtx)
+      INT
+      (OPTIONS INTMODE RTX) (NA NA ANY)
+      ARG
+      ;; FIXME: s/DFLT/&mode/ ?
+      (let* ((operand (rtx-eval-with-estate op-rtx DFLT *estate*))
+	     (f (hw-index:value (op:index operand)))
+	     (f-name (obj:name f)))
+	(make <operand> (if (source-ident? f) (obj-location f) #f)
+	      f-name f-name
+	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
+			   (obj-atlist f))
+	      (obj:name (ifld-hw-type f))
+	      (obj:name (ifld-mode f))
+	      (make <hw-index> 'anonymous
+		    'ifield
+		    (ifld-mode f)
+		    ; (send (op:type op) 'get-index-mode)
+		    f)
+	      nil #f #f))
+)
 
 ; Same as index-of, but improves readability for registers.
 
-(drmn (regno reg)
+(define-rtx-macro-node (regno reg)
       (list 'index-of reg)
 )
 
@@ -235,7 +235,7 @@
 ; These are implemented as syntax nodes as we must pass INDX to `s-hw'
 ; unevaluated.
 ; ??? Not currently supported.  Not sure whether it should be.
-;(drsn (hw &options &mode hw-elm . indx-sel)
+;(define-rtx-syntax-node (hw &options &mode hw-elm . indx-sel)
 ;      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT)
 ;      ARG
 ;      (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
@@ -245,45 +245,43 @@
 ;      (s-hw *estate* mode hw-elm indx selector)
 ;)
 
-(display "APB: <aaa>")
-
 ; Register accesses.
 ; INDX-SEL is an optional index and possible selector.
-;; (dron (reg &options &mode hw-elm . indx-sel)
-;;       #f
-;;       (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
-;;       ARG
-;;       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
-;; 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
-;; 			  (cadr indx-sel)
-;; 			  hw-selector-default)))
-;; 	(s-hw *estate* mode hw-elm indx selector))
-;; )
+(define-rtx-operand-node (reg &options &mode hw-elm . indx-sel)
+      #f
+      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
+      ARG
+      (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
+	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
+			  (cadr indx-sel)
+			  hw-selector-default)))
+	(s-hw *estate* mode hw-elm indx selector))	    
+)
 
 ; A raw-reg bypasses the getter/setter stuff.  It's usually used in
 ; getter/setter definitions.
 
-;; (dron (raw-reg &options &mode hw-elm . indx-sel)
-;;       #f
-;;       (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
-;;       ARG
-;;       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
-;; 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
-;; 			  (cadr indx-sel)
-;; 			  hw-selector-default)))
-;; 	(let ((result (s-hw *estate* mode hw-elm indx selector)))
-;; 	  (obj-cons-attr! result (bool-attr-make 'RAW #t))
-;; 	  result))
-;; )
+(define-rtx-operand-node (raw-reg &options &mode hw-elm . indx-sel)
+      #f
+      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
+      ARG
+      (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
+	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
+			  (cadr indx-sel)
+			  hw-selector-default)))
+	(let ((result (s-hw *estate* mode hw-elm indx selector)))
+	  (obj-cons-attr! result (bool-attr-make 'RAW #t))
+	  result))
+)
 
 ; Memory accesses.
-;; (dron (mem &options &mode addr . sel)
-;;       #f
-;;       (OPTIONS EXPLNUMMODE RTX . RTX) (NA NA AI . INT)
-;;       ARG
-;;       (s-hw *estate* mode 'h-memory addr
-;; 	    (if (pair? sel) (car sel) hw-selector-default))
-;; )
+(define-rtx-operand-node (mem &options &mode addr . sel)
+      #f
+      (OPTIONS EXPLNUMMODE RTX . RTX) (NA NA AI . INT)
+      ARG
+      (s-hw *estate* mode 'h-memory addr
+	    (if (pair? sel) (car sel) hw-selector-default))
+)
 
 ; Instruction execution support.
 ; There are no jumps, per se.  A jump is a set of `pc'.
@@ -291,14 +289,14 @@
 ; The program counter.
 ; ??? Hmmm... needed?  The pc is usually specified as `pc' which is shorthand
 ; for (operand pc).
-;(dron (pc) () () ARG s-pc)
+;(define-rtx-operand-node (pc) () () ARG s-pc)
 
 ; Fetch bytes from the instruction stream of size MODE.
 ; FIXME: Later need to augment this by passing an indicator to the mem-fetch
 ; routines that we're doing an ifetch.
 ; ??? wip!
 
-(drmn (ifetch mode pc)
+(define-rtx-macro-node (ifetch mode pc)
       (list 'mem mode pc) ; hw-selector-ispace
 )
 
@@ -307,14 +305,14 @@
 ; index into the scache [as an offset from the first insn].
 ; ??? wip!
 
-(drmn (decode mode pc insn num)
+(define-rtx-macro-node (decode mode pc insn num)
       (list 'c-call mode 'EXTRACT pc insn num)
 )
 
 ; NUM is the same number passed to `decode'.
 ; ??? wip!
 
-(drmn (execute mode num)
+(define-rtx-macro-node (execute mode num)
       (list 'c-call mode 'EXECUTE num)
 )
 
@@ -327,7 +325,7 @@
 ; The mode of the result is the mode of RTX.
 ; ??? wip!
 
-(drn (delay &options &mode n rtx)
+(define-rtx-node (delay &options &mode n rtx)
      #f
      (OPTIONS VOIDORNUMMODE RTX RTX) (NA NA INT MATCHEXPR)
      MISC
@@ -339,7 +337,7 @@
 ; The target is required to define SEM_ANNUL_INSN.
 ; ??? wip!
 
-(drmn (annul yes?)
+(define-rtx-macro-node (annul yes?)
       ; The pc reference here is hidden in c-code to not generate a spurious
       ; pc input operand.
       (list 'c-call 'VOID "SEM_ANNUL_INSN" (list 'c-code 'IAI "pc") yes?)
@@ -350,7 +348,7 @@
 ; ??? This is similar to annul.  Deletion of one of them defered.
 ; ??? wip!
 
-(drn (skip &options &mode yes?)
+(define-rtx-node (skip &options &mode yes?)
      VOID
      (OPTIONS VOIDMODE RTX) (NA NA INT)
      MISC
@@ -372,7 +370,7 @@
 ; We just want the symbols.
 ; FIXME: Hmmm... it currently isn't a syntax node.
 
-(drn (eq-attr &options &mode owner attr value)
+(define-rtx-node (eq-attr &options &mode owner attr value)
      BI
       (OPTIONS BIMODE RTX SYMBOL SYMORNUM) (NA NA ANY NA NA)
       MISC
@@ -392,7 +390,7 @@
 ; This uses INTMODE because we can't otherwise determine the
 ; mode of the result (if elided).
 
-(drn (int-attr &options &mode obj attr-name)
+(define-rtx-node (int-attr &options &mode obj attr-name)
      #f
      (OPTIONS INTMODE RTX SYMBOL) (NA NA ANY NA)
      MISC
@@ -401,14 +399,14 @@
 
 ;; Deprecated alias for int-attr.
 
-(drmn (attr arg1 . rest)
+(define-rtx-macro-node (attr arg1 . rest)
       (cons 'int-attr (cons arg1 rest))
 )
 
 ; Same as `quote', for use in attributes cus "quote" sounds too jargonish.
 ; [Ok, not a strong argument for using "symbol", but so what?]
 
-(drsn (symbol &options &mode name)
+(define-rtx-syntax-node (symbol &options &mode name)
       SYM
       (OPTIONS SYMMODE SYMBOL) (NA NA NA)
       ARG
@@ -417,7 +415,7 @@
 
 ; Return the current instruction.
 
-(drn (current-insn &options &mode)
+(define-rtx-node (current-insn &options &mode)
      INSN
      (OPTIONS INSNMODE) (NA NA)
      MISC
@@ -430,7 +428,7 @@
 ; Return the currently selected machine.
 ; This can either be a compile-time or run-time value.
 
-(drn (current-mach &options &mode)
+(define-rtx-node (current-mach &options &mode)
      MACH
      (OPTIONS MACHMODE) (NA NA)
      MISC
@@ -440,7 +438,7 @@
 ; Constants.
 
 ; FIXME: Need to consider 64 bit hosts.
-(drn (const &options &mode c)
+(define-rtx-node (const &options &mode c)
      #f
      (OPTIONS ANYNUMMODE NUMBER) (NA NA NA)
      ARG
@@ -454,7 +452,7 @@
 ; Arguments are specified most significant to least significant.
 ; ??? Not all of the combinations are supported in the simulator.
 ; They'll get added as necessary.
-(drn (join &options &out-mode in-mode arg1 . arg-rest)
+(define-rtx-node (join &options &out-mode in-mode arg1 . arg-rest)
      #f
      (OPTIONS ANYNUMMODE ANYNUMMODE RTX . RTX) (NA NA NA ANY . ANY)
      MISC
@@ -477,7 +475,7 @@
 ; and code which analyzes it would otherwise use the result mode (specified by
 ; `&mode') for the mode of operand0.
 
-(drn (subword &options &mode value word-num)
+(define-rtx-node (subword &options &mode value word-num)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA ANY INT)
      ARG
@@ -487,13 +485,13 @@
 ; ??? The split and concat stuff is just an experiment and should not be used.
 ; What's there now is just "thoughts put down on paper."
 
-(drmn (split split-mode in-mode di)
+(define-rtx-macro-node (split split-mode in-mode di)
       ; FIXME: Ensure compatible modes
       ;(list 'c-raw-call 'BLK (string-append "SPLIT" in-mode split-mode) di)
       '(const 0)
 )
 
-(drmn (concat modes arg1 . arg-rest)
+(define-rtx-macro-node (concat modes arg1 . arg-rest)
       ; FIXME: Here might be the place to ensure
       ; (= (length modes) (length (cons arg1 arg-rest))).
       ;(cons 'c-raw-call (cons modes (cons "CONCAT" (cons arg1 arg-rest))))
@@ -504,7 +502,7 @@
 ; ??? GCC RTL calls this "unspec" which is arguably a more application
 ; independent name.
 
-(drn (c-code &options &mode text)
+(define-rtx-node (c-code &options &mode text)
      #f
      (OPTIONS ANYCEXPRMODE STRING) (NA NA NA)
      UNSPEC
@@ -521,7 +519,7 @@
 ; If it is VOID this call is a statement and ';' is appended.
 ; Otherwise it is part of an expression.
 
-(drn (c-call &options &mode name . args)
+(define-rtx-node (c-call &options &mode name . args)
      #f
      (OPTIONS ANYCEXPRMODE STRING . RTX) (NA NA NA . ANY)
      UNSPEC
@@ -530,7 +528,7 @@
 
 ; Same as c-call but without implicit first arg of `current_cpu'.
 
-(drn (c-raw-call &options &mode name . args)
+(define-rtx-node (c-raw-call &options &mode name . args)
      #f
      (OPTIONS ANYCEXPRMODE STRING . RTX) (NA NA NA . ANY)
      UNSPEC
@@ -539,7 +537,7 @@
 
 ; Set/get/miscellaneous
 
-(drn (nop &options &mode)
+(define-rtx-node (nop &options &mode)
      VOID
      (OPTIONS VOIDMODE) (NA NA)
      MISC
@@ -548,7 +546,7 @@
 
 ; Clobber - mark an object as modified without explaining why or how.
 
-(drn (clobber &options &mode object)
+(define-rtx-node (clobber &options &mode object)
      VOID
      (OPTIONS VOIDORNUMMODE RTX) (NA NA MATCHEXPR)
      MISC
@@ -574,14 +572,14 @@
 ; ??? One might want a `!' suffix as in `set!', but methinks that's following
 ; Scheme too closely.
 
-(drn (set &options &mode dst src)
+(define-rtx-node (set &options &mode dst src)
      VOID
      (OPTIONS ANYNUMMODE SETRTX RTX) (NA NA MATCHEXPR MATCH2)
      SET
      #f
 )
 
-(drn (set-quiet &options &mode dst src)
+(define-rtx-node (set-quiet &options &mode dst src)
      VOID
      (OPTIONS ANYNUMMODE SETRTX RTX) (NA NA MATCHEXPR MATCH2)
      SET
@@ -616,14 +614,14 @@
 ;   from the arguments [elsewhere is a description of the tradeoffs]
 ; - ???
 
-(drn (neg &options &mode s1)
+(define-rtx-node (neg &options &mode s1)
      #f
      (OPTIONS ANYNUMMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
 
-(drn (abs &options &mode s1)
+(define-rtx-node (abs &options &mode s1)
      #f
      (OPTIONS ANYNUMMODE RTX) (NA NA MATCHEXPR)
      UNARY
@@ -633,7 +631,7 @@
 ; For integer values this is a bitwise operation (each bit inverted).
 ; For floating point values this produces 1/x.
 ; ??? Might want different names.
-(drn (inv &options &mode s1)
+(define-rtx-node (inv &options &mode s1)
      #f
      (OPTIONS ANYINTMODE RTX) (NA NA MATCHEXPR)
      UNARY
@@ -643,20 +641,20 @@
 ; This is a boolean operation.
 ; MODE is the mode of S1.  The result always has mode BI.
 ; ??? Perhaps `mode' shouldn't be here.
-(drn (not &options &mode s1)
+(define-rtx-node (not &options &mode s1)
      BI
      (OPTIONS ANYINTMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
 
-(drn (add &options &mode s1 s2)
+(define-rtx-node (add &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (sub &options &mode s1 s2)
+(define-rtx-node (sub &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
@@ -667,37 +665,37 @@
 ; "s3" here must have type BI.
 ; For the *flag rtx's, MODE is the mode of S1,S2; the result always has
 ; mode BI.
-(drn (addc &options &mode s1 s2 s3)
+(define-rtx-node (addc &options &mode s1 s2 s3)
      #f
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (addc-cflag &options &mode s1 s2 s3)
+(define-rtx-node (addc-cflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (addc-oflag &options &mode s1 s2 s3)
+(define-rtx-node (addc-oflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (subc &options &mode s1 s2 s3)
+(define-rtx-node (subc &options &mode s1 s2 s3)
      #f
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (subc-cflag &options &mode s1 s2 s3)
+(define-rtx-node (subc-cflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (subc-oflag &options &mode s1 s2 s3)
+(define-rtx-node (subc-oflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
@@ -705,25 +703,25 @@
 )
 
 ;; ??? These are deprecated.  Delete in time.
-(drn (add-cflag &options &mode s1 s2 s3)
+(define-rtx-node (add-cflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (add-oflag &options &mode s1 s2 s3)
+(define-rtx-node (add-oflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (sub-cflag &options &mode s1 s2 s3)
+(define-rtx-node (sub-cflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
      #f
 )
-(drn (sub-oflag &options &mode s1 s2 s3)
+(define-rtx-node (sub-oflag &options &mode s1 s2 s3)
      BI
      (OPTIONS ANYINTMODE RTX RTX RTX) (NA NA MATCHEXPR MATCH2 BI)
      TRINARY
@@ -736,14 +734,14 @@
 ; operation.
 
 ; Return bit indicating if VALUE is zero/non-zero.
-(drmn (zflag arg1 . rest) ; mode value)
+(define-rtx-macro-node (zflag arg1 . rest) ; mode value)
       (if (null? rest) ; mode missing?
 	  (list 'eq 'DFLT arg1 0)
 	  (list 'eq arg1 (car rest) 0))
 )
 
 ; Return bit indicating if VALUE is negative/non-negative.
-(drmn (nflag arg1 . rest) ; mode value)
+(define-rtx-macro-node (nflag arg1 . rest) ; mode value)
       (if (null? rest) ; mode missing?
 	  (list 'lt 'DFLT arg1 0)
 	  (list 'lt arg1 (car rest) 0))
@@ -751,21 +749,21 @@
 
 ; Multiply/divide.
 
-(drn (mul &options &mode s1 s2)
+(define-rtx-node (mul &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
 ; 1's complement overflow
-(drn (mul-o1flag &options &mode s1 s2)
+(define-rtx-node (mul-o1flag &options &mode s1 s2)
      BI
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
 ; 2's complement overflow
-(drn (mul-o2flag &options &mode s1 s2)
+(define-rtx-node (mul-o2flag &options &mode s1 s2)
      BI
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
@@ -775,31 +773,31 @@
 ; ??? Need two variants, one that avoids implementation defined situations
 ; [both host and target], and one that specifies implementation defined
 ; situations [target].
-(drn (div &options &mode s1 s2)
+(define-rtx-node (div &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (udiv &options &mode s1 s2)
+(define-rtx-node (udiv &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (mod &options &mode s1 s2)
+(define-rtx-node (mod &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (umod &options &mode s1 s2)
+(define-rtx-node (umod &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (rem &options &mode s1 s2)
+(define-rtx-node (rem &options &mode s1 s2)
      #f
      (OPTIONS ANYFLOATMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
@@ -810,40 +808,40 @@
 
 ; various floating point routines
 
-(drn (sqrt &options &mode s1)
+(define-rtx-node (sqrt &options &mode s1)
      #f
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
 
-(drn (cos &options &mode s1)
+(define-rtx-node (cos &options &mode s1)
      #f
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
 
-(drn (sin &options &mode s1)
+(define-rtx-node (sin &options &mode s1)
      #f
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
 
-(drn (nan &options &mode s1)
+(define-rtx-node (nan &options &mode s1)
      BI
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
-(drn (qnan &options &mode s1)
+(define-rtx-node (qnan &options &mode s1)
      BI
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
      #f
 )
-(drn (snan &options &mode s1)
+(define-rtx-node (snan &options &mode s1)
      BI
      (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
      UNARY
@@ -852,28 +850,28 @@
 
 ; min/max
 
-(drn (min &options &mode s1 s2)
+(define-rtx-node (min &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
 
-(drn (max &options &mode s1 s2)
+(define-rtx-node (max &options &mode s1 s2)
      #f
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
 
-(drn (umin &options &mode s1 s2)
+(define-rtx-node (umin &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
 
-(drn (umax &options &mode s1 s2)
+(define-rtx-node (umax &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
@@ -881,19 +879,19 @@
 )
 
 ; These are bitwise operations.
-(drn (and &options &mode s1 s2)
+(define-rtx-node (and &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (or &options &mode s1 s2)
+(define-rtx-node (or &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
      #f
 )
-(drn (xor &options &mode s1 s2)
+(define-rtx-node (xor &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      BINARY
@@ -902,33 +900,33 @@
 
 ; Shift operations.
 
-(drn (sll &options &mode s1 s2)
+(define-rtx-node (sll &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR INT)
      BINARY
      #f
 )
-(drn (srl &options &mode s1 s2)
+(define-rtx-node (srl &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR INT)
      BINARY
      #f
 )
 ; ??? In non-sim case, ensure s1 is in right C type for right result.
-(drn (sra &options &mode s1 s2)
+(define-rtx-node (sra &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR INT)
      BINARY
      #f
 )
 ; Rotates don't really have a sign, so doesn't matter what we say.
-(drn (ror &options &mode s1 s2)
+(define-rtx-node (ror &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR INT)
      BINARY
      #f
 )
-(drn (rol &options &mode s1 s2)
+(define-rtx-node (rol &options &mode s1 s2)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA MATCHEXPR INT)
      BINARY
@@ -942,13 +940,13 @@
 ; ??? 'twould also simplify several .cpu description entries.
 ; On the other hand, handling an arbitrary number of args isn't supported by
 ; ISA's, which the main goal of what we're trying to represent.
-(drn (andif &options &mode s1 s2)
+(define-rtx-node (andif &options &mode s1 s2)
      BI
      (OPTIONS BIMODE RTX RTX) (NA NA ANYINT ANYINT)
      BINARY ; IF?
      #f
 )
-(drn (orif &options &mode s1 s2)
+(define-rtx-node (orif &options &mode s1 s2)
      BI
      (OPTIONS BIMODE RTX RTX) (NA NA ANYINT ANYINT)
      BINARY ; IF?
@@ -958,26 +956,26 @@
 ; `bitfield' is an experimental operation.
 ; It's not really needed but it might help simplify some things.
 ;
-;(drn (bitfield mode src start length)
+;(define-rtx-node (bitfield mode src start length)
 ;     ...
 ;     ...
 ;)
 
 ;; Integer conversions.
 
-(drn (ext &options &mode s1)
+(define-rtx-node (ext &options &mode s1)
      #f
      (OPTIONS ANYINTMODE RTX) (NA NA ANY)
      UNARY
      #f
 )
-(drn (zext &options &mode s1)
+(define-rtx-node (zext &options &mode s1)
      #f
      (OPTIONS ANYINTMODE RTX) (NA NA ANY)
      UNARY
      #f
 )
-(drn (trunc &options &mode s1)
+(define-rtx-node (trunc &options &mode s1)
      #f
      (OPTIONS ANYINTMODE RTX) (NA NA ANY)
      UNARY
@@ -986,37 +984,37 @@
 
 ;; Conversions involving floating point values.
 
-(drn (fext &options &mode how s1)
+(define-rtx-node (fext &options &mode how s1)
      #f
      (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ftrunc &options &mode how s1)
+(define-rtx-node (ftrunc &options &mode how s1)
      #f
      (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (float &options &mode how s1)
+(define-rtx-node (float &options &mode how s1)
      #f
      (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ufloat &options &mode how s1)
+(define-rtx-node (ufloat &options &mode how s1)
      #f
      (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (fix &options &mode how s1)
+(define-rtx-node (fix &options &mode how s1)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ufix &options &mode how s1)
+(define-rtx-node (ufix &options &mode how s1)
      #f
      (OPTIONS ANYINTMODE RTX RTX) (NA NA INT ANY)
      UNARY
@@ -1026,70 +1024,70 @@
 ; Comparisons.
 ; MODE is the mode of S1,S2.  The result always has mode BI.
 
-(drn (eq &options &mode s1 s2)
+(define-rtx-node (eq &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
-(drn (ne &options &mode s1 s2)
-     BI
-     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
-     COMPARE
-     #f
-)
-; ??? In non-sim case, ensure s1,s2 is in right C type for right result.
-(drn (lt &options &mode s1 s2)
-     BI
-     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
-     COMPARE
-     #f
-)
-(drn (le &options &mode s1 s2)
-     BI
-     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
-     COMPARE
-     #f
-)
-(drn (gt &options &mode s1 s2)
-     BI
-     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
-     COMPARE
-     #f
-)
-(drn (ge &options &mode s1 s2)
+(define-rtx-node (ne &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
 ; ??? In non-sim case, ensure s1,s2 is in right C type for right result.
-(drn (ltu &options &mode s1 s2)
+(define-rtx-node (lt &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
-(drn (leu &options &mode s1 s2)
+(define-rtx-node (le &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
-(drn (gtu &options &mode s1 s2)
+(define-rtx-node (gt &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
-(drn (geu &options &mode s1 s2)
+(define-rtx-node (ge &options &mode s1 s2)
+     BI
+     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
+     COMPARE
+     #f
+)
+; ??? In non-sim case, ensure s1,s2 is in right C type for right result.
+(define-rtx-node (ltu &options &mode s1 s2)
+     BI
+     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
+     COMPARE
+     #f
+)
+(define-rtx-node (leu &options &mode s1 s2)
+     BI
+     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
+     COMPARE
+     #f
+)
+(define-rtx-node (gtu &options &mode s1 s2)
+     BI
+     (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
+     COMPARE
+     #f
+)
+(define-rtx-node (geu &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
      #f
 )
 ; Detect NaNs
-(drn (unordered &options &mode s1 s2)
+(define-rtx-node (unordered &options &mode s1 s2)
      BI
      (OPTIONS ANYNUMMODE RTX RTX) (NA NA MATCHEXPR MATCH2)
      COMPARE
@@ -1102,7 +1100,7 @@
 ; Return a boolean (BI mode) indicating if VALUE is in SET.
 ; VALUE is any constant rtx.  SET is a `number-list' rtx.
 
-(drn (member &options &mode value set)
+(define-rtx-node (member &options &mode value set)
      #f
      (OPTIONS BIMODE RTX RTX) (NA NA INT INT)
      MISC
@@ -1121,7 +1119,7 @@
 ;; FIXME: "number" in "number-list" implies floats are ok.
 ;; Rename to integer-list, int-list, or some such.
 
-(drn (number-list &options &mode value-list)
+(define-rtx-node (number-list &options &mode value-list)
      #f
      (OPTIONS INTMODE NUMBER . NUMBER) (NA NA NA . NA)
      MISC
@@ -1131,7 +1129,7 @@
 ; Conditional execution.
 
 ; FIXME: make syntax node?
-(drn (if &options &mode cond then . else)
+(define-rtx-node (if &options &mode cond then . else)
      #f
      ;; ??? It would be cleaner if TESTRTX had to have BI mode.
      (OPTIONS ANYEXPRMODE TESTRTX RTX . RTX) (NA NA ANYINT MATCHEXPR . MATCH3)
@@ -1144,7 +1142,7 @@
 ; ??? The syntax here isn't quite right, there must be at least one cond rtx.
 ; ??? Intermediate expressions (the ones before the last one) needn't have
 ; the same mode as the result.
-(drsn (cond &options &mode . cond-code-list)
+(define-rtx-syntax-node (cond &options &mode . cond-code-list)
      #f
       (OPTIONS ANYEXPRMODE . CONDRTX) (NA NA . MATCHEXPR)
       COND
@@ -1154,7 +1152,7 @@
 ; ??? The syntax here isn't quite right, there must be at least one case.
 ; ??? Intermediate expressions (the ones before the last one) needn't have
 ; the same mode as the result.
-(drn (case &options &mode test . case-list)
+(define-rtx-node (case &options &mode test . case-list)
      #f
      (OPTIONS ANYEXPRMODE RTX . CASERTX) (NA NA ANY . MATCHEXPR)
      COND
@@ -1168,7 +1166,7 @@
 ; IGNORE is for consistency with sequence.  ??? Delete some day.
 ; ??? There's no real need for mode either, but convention requires it.
 
-(drsn (parallel &options &mode ignore expr . exprs)
+(define-rtx-syntax-node (parallel &options &mode ignore expr . exprs)
      #f
       (OPTIONS VOIDMODE LOCALS RTX . RTX) (NA NA NA VOID . VOID)
       SEQUENCE
@@ -1178,7 +1176,7 @@
 ; This has to be a syntax node to handle locals properly: they're not defined
 ; yet and thus pre-evaluating the expressions doesn't work.
 
-(drsn (sequence &options &mode locals expr . exprs)
+(define-rtx-syntax-node (sequence &options &mode locals expr . exprs)
      #f
       (OPTIONS VOIDORNUMMODE LOCALS RTX . RTX) (NA NA NA MATCHSEQ . MATCHSEQ)
       SEQUENCE
@@ -1188,19 +1186,19 @@
 ; This has to be a syntax node to handle iter-var properly: it's not defined
 ; yet and thus pre-evaluating the expressions doesn't work.
 
-;; (drsn (do-count &options &mode iter-var nr-times expr . exprs)
-;;      #f
-;;       (OPTIONS VOIDMODE ITERATION RTX RTX . RTX) (NA NA NA INT VOID . VOID)
-;;       SEQUENCE
-;;       #f
-;; )
+(define-rtx-syntax-node (do-count &options &mode iter-var nr-times expr . exprs)
+     #f
+      (OPTIONS VOIDMODE ITERATION RTX RTX . RTX) (NA NA NA INT VOID . VOID)
+      SEQUENCE
+      #f
+)
 
 ; Internal rtx to create a closure.
 ; Internal, so it does not appear in rtl.texi (at least not yet).
 ; ??? Maybe closures shouldn't be separate from sequences,
 ; but I'm less convinced these days.
 
-(drsn (closure &options &mode isa-name-list env-stack expr)
+(define-rtx-syntax-node (closure &options &mode isa-name-list env-stack expr)
      #f
       (OPTIONS VOIDORNUMMODE SYMBOLLIST ENVSTACK RTX) (NA NA NA NA MATCHEXPR)
       MISC
