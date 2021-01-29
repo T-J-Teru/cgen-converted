@@ -11,6 +11,8 @@
 ; - the prefix "gen-" comes from cgen's convention that procs that return C
 ;   code, and only those procs, are prefixed with "gen-"
 
+;; (use-modules (ice-9 top-repl))
+
 (define nil '())
 
 ; Hobbit support code; for when not using hobbit.

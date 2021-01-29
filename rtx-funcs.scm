@@ -18,14 +18,14 @@
 (define (def-rtx-funcs)
 
 ; Do not change the indentation here.
-(let
-(
- ; These are defined in rtl.scm.
- (drn define-rtx-node)
- (drsn define-rtx-syntax-node)
- (dron define-rtx-operand-node)
- (drmn define-rtx-macro-node)
-)
+  (let
+      (
+       ;; These are defined in rtl.scm.
+       (drn define-rtx-node)
+       (drsn define-rtx-syntax-node)
+       ;;(dron define-rtx-operand-node)
+       (drmn define-rtx-macro-node)
+       )
 
 ; The reason for the odd indenting above is so that emacs begins indenting the
 ; following code at column 1.
@@ -60,31 +60,31 @@
 ; Ifields are normally specified by name, but they are subsequently wrapped
 ; in this.
 
-(dron (ifield &options &mode ifld-name)
-      #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/IFIELD-NAME/ ?
-      ARG
-      (let ((f (current-ifld-lookup ifld-name)))
-	(make <operand> (obj-location f)
-	      ifld-name (string-append ifld-name " used as operand")
-	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
-			   (obj-atlist f))
-	      (obj:name (ifld-hw-type f))
-	      (obj:name (ifld-mode f))
-	      (make <hw-index> 'anonymous 'ifield (ifld-mode f) f)
-	      nil #f #f))
-)
+;; (dron (ifield &options &mode ifld-name)
+;;       #f
+;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/IFIELD-NAME/ ?
+;;       ARG
+;;       (let ((f (current-ifld-lookup ifld-name)))
+;; 	(make <operand> (obj-location f)
+;; 	      ifld-name (string-append ifld-name " used as operand")
+;; 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
+;; 			   (obj-atlist f))
+;; 	      (obj:name (ifld-hw-type f))
+;; 	      (obj:name (ifld-mode f))
+;; 	      (make <hw-index> 'anonymous 'ifield (ifld-mode f) f)
+;; 	      nil #f #f))
+;; )
 
 ; Specify an operand.
 ; Operands are normally specified by name, but they are subsequently wrapped
 ; in this.
 
-(dron (operand &options &mode op-name)
-      #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
-      ARG
-      (current-op-lookup op-name)
-)
+;; (dron (operand &options &mode op-name)
+;;       #f
+;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
+;;       ARG
+;;       (current-op-lookup op-name)
+;; )
 
 ; Operand naming/numbering.
 ; Operands are given names so that the operands as used in the semantics can
@@ -126,12 +126,12 @@
 ; it expresses all the state].
 ; Compiled operands are wrapped in this so that they still look like rtx.
 
-(dron (xop &options &mode object)
-      #f
-      (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; ??? s/OBJECT/OPERAND/ ?
-      ARG
-      object
-)
+;; (dron (xop &options &mode object)
+;;       #f
+;;       (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; ??? s/OBJECT/OPERAND/ ?
+;;       ARG
+;;       object
+;; )
 
 ;(dron (opspec: &options &mode op-name op-num hw-ref attrs)
 ;      (OPTIONS ANYNUMMODE SYMBOL NUMBER RTX ATTRS) (NA NA NA NA ANY NA)
@@ -152,12 +152,12 @@
 ; Local variables are normally specified by name, but they are subsequently
 ; wrapped in this.
 
-(dron (local &options &mode local-name)
-      #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/LOCAL-NAME/ ?
-      ARG
-      (rtx-temp-lookup (tstate-env *tstate*) local-name)
-)
+;; (dron (local &options &mode local-name)
+;;       #f
+;;       (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/LOCAL-NAME/ ?
+;;       ARG
+;;       (rtx-temp-lookup (tstate-env *tstate*) local-name)
+;; )
 
 ; FIXME: This doesn't work.  See s-operand.
 ;(define (s-dup estate op-name)
@@ -197,27 +197,27 @@
 ; ??? Mode handling incomplete, this doesn't handle mem, which it could.
 ; Until then we fix the mode of the result to INT.
 
-(dron (index-of &options &mode op-rtx)
-      INT
-      (OPTIONS INTMODE RTX) (NA NA ANY)
-      ARG
-      ;; FIXME: s/DFLT/&mode/ ?
-      (let* ((operand (rtx-eval-with-estate op-rtx DFLT *estate*))
-	     (f (hw-index:value (op:index operand)))
-	     (f-name (obj:name f)))
-	(make <operand> (if (source-ident? f) (obj-location f) #f)
-	      f-name f-name
-	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
-			   (obj-atlist f))
-	      (obj:name (ifld-hw-type f))
-	      (obj:name (ifld-mode f))
-	      (make <hw-index> 'anonymous
-		    'ifield
-		    (ifld-mode f)
-		    ; (send (op:type op) 'get-index-mode)
-		    f)
-	      nil #f #f))
-)
+;; (dron (index-of &options &mode op-rtx)
+;;       INT
+;;       (OPTIONS INTMODE RTX) (NA NA ANY)
+;;       ARG
+;;       ;; FIXME: s/DFLT/&mode/ ?
+;;       (let* ((operand (rtx-eval-with-estate op-rtx DFLT *estate*))
+;; 	     (f (hw-index:value (op:index operand)))
+;; 	     (f-name (obj:name f)))
+;; 	(make <operand> (if (source-ident? f) (obj-location f) #f)
+;; 	      f-name f-name
+;; 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
+;; 			   (obj-atlist f))
+;; 	      (obj:name (ifld-hw-type f))
+;; 	      (obj:name (ifld-mode f))
+;; 	      (make <hw-index> 'anonymous
+;; 		    'ifield
+;; 		    (ifld-mode f)
+;; 		    ; (send (op:type op) 'get-index-mode)
+;; 		    f)
+;; 	      nil #f #f))
+;; )
 
 ; Same as index-of, but improves readability for registers.
 
@@ -245,43 +245,45 @@
 ;      (s-hw *estate* mode hw-elm indx selector)
 ;)
 
+(display "APB: <aaa>")
+
 ; Register accesses.
 ; INDX-SEL is an optional index and possible selector.
-(dron (reg &options &mode hw-elm . indx-sel)
-      #f
-      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
-      ARG
-      (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
-	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
-			  (cadr indx-sel)
-			  hw-selector-default)))
-	(s-hw *estate* mode hw-elm indx selector))	    
-)
+;; (dron (reg &options &mode hw-elm . indx-sel)
+;;       #f
+;;       (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
+;;       ARG
+;;       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
+;; 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
+;; 			  (cadr indx-sel)
+;; 			  hw-selector-default)))
+;; 	(s-hw *estate* mode hw-elm indx selector))
+;; )
 
 ; A raw-reg bypasses the getter/setter stuff.  It's usually used in
 ; getter/setter definitions.
 
-(dron (raw-reg &options &mode hw-elm . indx-sel)
-      #f
-      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
-      ARG
-      (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
-	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
-			  (cadr indx-sel)
-			  hw-selector-default)))
-	(let ((result (s-hw *estate* mode hw-elm indx selector)))
-	  (obj-cons-attr! result (bool-attr-make 'RAW #t))
-	  result))
-)
+;; (dron (raw-reg &options &mode hw-elm . indx-sel)
+;;       #f
+;;       (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
+;;       ARG
+;;       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
+;; 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
+;; 			  (cadr indx-sel)
+;; 			  hw-selector-default)))
+;; 	(let ((result (s-hw *estate* mode hw-elm indx selector)))
+;; 	  (obj-cons-attr! result (bool-attr-make 'RAW #t))
+;; 	  result))
+;; )
 
 ; Memory accesses.
-(dron (mem &options &mode addr . sel)
-      #f
-      (OPTIONS EXPLNUMMODE RTX . RTX) (NA NA AI . INT)
-      ARG
-      (s-hw *estate* mode 'h-memory addr
-	    (if (pair? sel) (car sel) hw-selector-default))
-)
+;; (dron (mem &options &mode addr . sel)
+;;       #f
+;;       (OPTIONS EXPLNUMMODE RTX . RTX) (NA NA AI . INT)
+;;       ARG
+;;       (s-hw *estate* mode 'h-memory addr
+;; 	    (if (pair? sel) (car sel) hw-selector-default))
+;; )
 
 ; Instruction execution support.
 ; There are no jumps, per se.  A jump is a set of `pc'.
@@ -1186,12 +1188,12 @@
 ; This has to be a syntax node to handle iter-var properly: it's not defined
 ; yet and thus pre-evaluating the expressions doesn't work.
 
-(drsn (do-count &options &mode iter-var nr-times expr . exprs)
-     #f
-      (OPTIONS VOIDMODE ITERATION RTX RTX . RTX) (NA NA NA INT VOID . VOID)
-      SEQUENCE
-      #f
-)
+;; (drsn (do-count &options &mode iter-var nr-times expr . exprs)
+;;      #f
+;;       (OPTIONS VOIDMODE ITERATION RTX RTX . RTX) (NA NA NA INT VOID . VOID)
+;;       SEQUENCE
+;;       #f
+;; )
 
 ; Internal rtx to create a closure.
 ; Internal, so it does not appear in rtl.texi (at least not yet).
