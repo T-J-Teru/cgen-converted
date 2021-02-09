@@ -160,15 +160,18 @@
 		       #t ; include aliases
 		       #f) ; don't need to analyze semantics
 
-  ; Return a boolean indicating if BASE matches the base part of <insn> INSN.
-  (define (match-base base insn)
+  ;; Return a boolean indicating if BASE matches the base part of <insn> INSN.
+  (let ((match-base (lambda (base insn)
+;;  (define (match-base base insn)
     (let ((mask (compute-insn-base-mask (insn-iflds insn)))
 	  (ivalue (insn-value insn)))
       ; return (value & mask) == ivalue
-      (= (logand base mask) ivalue)))
+      (= (logand base mask) ivalue))))
+        (match-reset (lambda (value insn)
+                       #t)))
 
-  (define (match-rest value insn)
-    #t)
+;;  (define (match-rest value insn)
+;;    #t)
 
   (let ((base (if (list? value) (car value) value)))
     (let loop ((insns (current-insn-list)))
@@ -179,5 +182,5 @@
 		     (match-base base insn)
 		     (match-rest value insn))
 		insn
-		(loop (cdr insns)))))))
+		(loop (cdr insns))))))))
 )
