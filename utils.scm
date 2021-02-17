@@ -13,7 +13,8 @@
 
 (use-modules (ice-9 top-repl))
 
-(define nil '())
+(eval-when (expand load eval)
+  (define nil '()))
 
 ; Hobbit support code; for when not using hobbit.
 ; FIXME: eliminate this stuff ASAP.

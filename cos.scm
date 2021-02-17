@@ -270,13 +270,14 @@
 
 ;; Utility to count the number of non-#f elements in FLAGS.
 
+(eval-when (expand load eval)
 (define (/object-count-true flags)
   (let loop ((result 0) (flags flags))
     (if (null? flags)
 	result
 	(loop (+ result (if (car flags) 1 0))
 	      (cdr flags))))
-)
+))
 
 ;; If S is a symbol, convert it to a string.
 ;; Otherwise S must be a string, returned unchanged.
@@ -768,6 +769,7 @@
 ;; and writable members prefixed with '!'.  / and ! may appear in any order.
 ;; Each element is either member-name or (member-name . initial-value).
 
+(eval-when (expand load eval)
 (define (/parse-member-list member-spec)
   (let loop ((member-spec member-spec)
 	     (members nil)
@@ -807,8 +809,22 @@
 		    (if (and private? writable?)
 			(cons stripped-sym private-writable)
 			private-writable)))))))
-)
+))
 
+;; Main routine to define a class.
+;;
+;; This defines several things:
+;; - the class object with the specified class members
+;; - a predicate to identify instances of this class, named "class?"
+;; - getters and setters for each member
+;;
+;; Private members are specified as /member.
+;; Writable members are specified as !member.
+;; / and ! may be combined in any order.
+;;
+;; By convention name is formatted as <class-name>.
+
+(defmacro define-class (name prefix parents members)
 ;; Subroutine of define-class.
 ;; Return a list of definitions of member getters.
 
@@ -845,20 +861,7 @@
 	       members)))
 )
 
-;; Main routine to define a class.
-;;
-;; This defines several things:
-;; - the class object with the specified class members
-;; - a predicate to identify instances of this class, named "class?"
-;; - getters and setters for each member
-;;
-;; Private members are specified as /member.
-;; Writable members are specified as !member.
-;; / and ! may be combined in any order.
-;;
-;; By convention name is formatted as <class-name>.
 
-(defmacro define-class (name prefix parents members)
   (let* ((parsed-members (/parse-member-list members))
 	 (str-name (symbol->string name))
 	 (str-name-len (string-length str-name))
@@ -1187,6 +1190,35 @@
 		   `(define ,(symbol-append class-prefix '- elm-name)
 		      (elm-make-getter ,class (quote ,elm-name)))))
 	     elm-names)))
+
+
+;; (define-syntax define-getters
+;;   (lambda (stx)
+;;     (syntax-case stx ()
+;;       [(_ class prefix fields)
+;;        (with-syntax ([(method ...)
+;;                       (map (lambda (f)
+;;                              (datum->syntax
+;;                               stx
+;;                               (symbol-append
+;;                                (syntax->datum #'prefix)
+;;                                '-
+;;                                (if (pair? f) (cdr f) f))))
+;;                            (syntax->datum #'fields))]
+;;                      [(body ...)
+;;                       (map (lambda (f)
+;;                              (let ([ff (if (pair? f) (car f) f)])
+;;                                #`(elm-make-getter class
+;;                                                 '#,(datum->syntax stx (quote ff)))))
+;;                            (syntax->datum #'fields))]
+;;                      )
+;;                     (display "method = ")
+;;                     (display #'(method ...))
+;;                     (display "\n")
+;;                     #'(begin
+;;                         (define method body)
+;;                         ...))])))
+
 
 ;; Define the setter for a list of elements of a class.
 
